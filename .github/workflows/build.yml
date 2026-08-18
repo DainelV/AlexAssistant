@@ -3,7 +3,7 @@ name: Build Android APK
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:    # Permite ejecutar el workflow manualmente desde la pestaña Actions
+  workflow_dispatch:    # Permite ejecutarlo manualmente
 
 jobs:
   build:
@@ -11,13 +11,21 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v4   # (aún no hay v5, así que se mantiene)
 
     - name: Set up JDK 17
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5   # ✅ Actualizado a v5 (elimina el warning)
       with:
         java-version: '17'
         distribution: 'temurin'
+
+    # 🔥 PASO CLAVE: Dar permisos de ejecución al Gradle Wrapper
+    - name: Make Gradle Wrapper executable
+      run: chmod +x gradlew
+
+    # (Opcional) Paso de depuración para verificar que gradlew existe
+    - name: List files for debugging
+      run: ls -la
 
     - name: Build APK with Gradle
       run: ./gradlew assembleDebug
