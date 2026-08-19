@@ -19,66 +19,15 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Install Gradle and generate wrapper
-      run: |
-        wget https://services.gradle.org/distributions/gradle-8.10.2-bin.zip
-        unzip gradle-8.10.2-bin.zip
-        export PATH=$PATH:$(pwd)/gradle-8.10.2/bin
-        gradle wrapper
-        chmod +x gradlew
+    - name: Make Gradle Wrapper executable
+      run: chmod +x gradlew
 
-    # 🔍 PASO 1: Mostrar estructura completa de directorios
-    - name: Show full directory tree
-      run: |
-        echo "=== Directorio raíz ==="
-        ls -la
-        echo "=== Estructura de carpetas (hasta profundidad 3) ==="
-        find . -maxdepth 3 -type d | sort
+    - name: Build APK with Gradle
+      run: ./gradlew assembleDebug
 
-    # 🔍 PASO 2: Buscar archivos build.gradle
-    - name: Locate build.gradle files
-      run: |
-        echo "=== Archivos build.gradle encontrados ==="
-        find . -name "build.gradle" -o -name "build.gradle.kts"
-
-    # 🔍 PASO 3: Mostrar contenido del build.gradle raíz (si existe)
-    - name: Show root build.gradle
-      run: |
-        if [ -f build.gradle ]; then
-          echo "=== Contenido de build.gradle (raíz) ==="
-          cat build.gradle
-        else
-          echo "No hay build.gradle en la raíz"
-        fi
-
-    # 🔍 PASO 4: Verificar si existe carpeta app
-    - name: Check app folder
-      run: |
-        if [ -d app ]; then
-          echo "=== Contenido de app/ ==="
-          ls -la app/
-          if [ -f app/build.gradle ]; then
-            echo "=== build.gradle de app ==="
-            cat app/build.gradle
-          else
-            echo "No hay build.gradle en app/"
-          fi
-        else
-          echo "❌ No existe la carpeta app/"
-        fi
-
-    # 🔍 PASO 5: Listar TODAS las tareas de Gradle disponibles
-    - name: List Gradle tasks
-      run: ./gradlew tasks --all
-
-    # 🔍 PASO 6: Intentar compilar con las tareas más comunes
-    - name: Try build tasks
-      run: |
-        echo "Intentando con 'build'..."
-        ./gradlew build || echo "build falló"
-        echo "Intentando con 'assemble'..."
-        ./gradlew assemble || echo "assemble falló"
-        echo "Intentando con 'package'..."
-        ./gradlew package || echo "package falló"
-        echo "Intentando con 'install'..."
-        ./gradlew install || echo "install falló"
+    # ✅ PASO NUEVO: Subir la APK como artefacto descargable
+    - name: Upload APK as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug
+        path: app/build/outputs/apk/debug/*.apk
