@@ -16,3 +16,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "AlexAssistant"
 include(":app")
+include("app")
+include('app')
+include(':app')
